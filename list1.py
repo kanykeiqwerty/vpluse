@@ -1,9 +1,20 @@
 
+from datetime import datetime
 import json
 from bs4 import BeautifulSoup as BS
 import html
 from fetch import get_html_det, get_html_persons_det
 from config import urld, urlpd, headers_variants
+
+
+def parse_iso_date(value):
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(value.replace('Z', ''))
+    except Exception:
+        return None
+
 
 def parse_json(html_text):
     if not html_text:
@@ -55,10 +66,10 @@ def parse_json(html_text):
             'ProcedureType': status_description, 
             'CaseNumber': case_number,
             'CaseStatus' : item.get('isActive', ''),
-            'CaseEndDate': status_date,
+            'CaseEndDate': parse_iso_date(status_date),
             'ArbitrationManagerName': arbitr_manager,
             'ArbitrationManagerINN': None,
-            'ManagerAppointmentDate': item.get('statusUpdateDate', '')
+            'ManagerAppointmentDate': parse_iso_date(item.get('statusUpdateDate', ''))
             
         })
     
@@ -93,7 +104,7 @@ def get_company_details(guid):
         return {
             'KPP': item.get('kpp', ''),
             'AuthorizedCapital': item.get("authorizedCapital", ''),
-            'RegistrationDate': item.get('dateReg', ''),
+            'RegistrationDate': parse_iso_date(item.get('dateReg', '')),
             'LegalForm': okopf_name,
             'OKVED':okved_name,
             
@@ -195,8 +206,8 @@ def get_persons_details(guid):
 
         return {
             'EntrepreneurOGRNIP': item.get('ogrnip', ''),
-            'RegistrationDate': item.get('dateReg', ''),
-            'TerminationDate': status.get('date', ''),
+            'RegistrationDate': parse_iso_date(item.get('dateReg', '')),
+            'TerminationDate': parse_iso_date(status.get('date', '')),
             'BankruptcyStatus': status.get('isActive', ''),
             'EntrepreneurStatus': status.get('name', ''),
             'OKVED': okved.get('name', ''),
@@ -225,7 +236,7 @@ def get_more_persons_details(guid):
         item = json.loads(html_text)
 
         return{
-            'BirthDate': item.get('birthdateBankruptcy', ''), 
+            'BirthDate': parse_iso_date(item.get('birthdateBankruptcy', '')), 
             'BirthPlace': item.get('birthplaceBankruptcy', ''),
         }
 
