@@ -2,6 +2,8 @@ url='https://bankrot.fedresurs.ru/backend/cmpbankrupts'
 urld='https://fedresurs.ru/backend/companies'
 urlpd='https://fedresurs.ru/backend/persons'
 urlp='https://bankrot.fedresurs.ru/backend/prsnbankrupts'
+
+
 headers = {
     "User-Agent": "Browser",
     "Accept": "application/json, text/plain, */*",

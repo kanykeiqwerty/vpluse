@@ -1,6 +1,6 @@
-from fetch import get_html, get_html_persons
-from list1 import parse_json, get_company_details, get_persons_details, get_more_persons_details
-from list1 import parse_person
+from fetch import fetch_html
+from parser.list1 import parse_json, get_company_details
+from parser.list2 import parse_person, get_persons_details, get_more_persons_details
 from ex import save_to_excel
 from config import url, urlp, PAGE_SIZE, headers
 import time
@@ -27,7 +27,7 @@ def main():
             full_url = f"{url}?limit={PAGE_SIZE}&offset={offset}"
 
             try:
-                html_text = get_html(full_url)
+                html_text = fetch_html(full_url, headers=headers)
                 parsed_data = parse_json(html_text)
             except Exception as e:
                 print(f"Ошибка при загрузке или парсинге компаний: {e}")
@@ -45,7 +45,7 @@ def main():
 
             print(f"Загружено всего: {len(companies_data)} компаний")
 
-            if len(companies_data) >= 15:
+            if len(companies_data) >= 1000:
                 break
 
        
@@ -75,7 +75,7 @@ def main():
 
             try:
                 
-                html_text = get_html_persons(full_url, headers=headers)
+                html_text = fetch_html(full_url, headers=headers)
                 parsed_data = parse_person(html_text)
             except Exception as e:
                 print(f"Ошибка при загрузке или парсинге физлиц: {e}")
@@ -93,7 +93,7 @@ def main():
 
             print(f"Загружено всего: {len(individuals_data)} физлиц")
 
-            if len(individuals_data) >= 15:
+            if len(individuals_data) >= 1000:
                 break
 
         print(f"\nЗагружено физлиц: {len(individuals_data)}")
