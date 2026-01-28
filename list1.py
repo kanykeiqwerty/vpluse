@@ -14,6 +14,39 @@ def parse_iso_date(value):
         return datetime.fromisoformat(value.replace('Z', ''))
     except Exception:
         return None
+    
+
+import requests
+
+def get_publications_count(guid, headers=None):
+    try:
+        url = f"https://fedresurs.ru/backend/companies/{guid}/publications?limit=1&offset=0"
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+        # Важно: смотрим, где лежит общее количество
+        # Например, data.get('total') или data.get('totalCount')
+        total = data.get('found') or data.get('totalCount') or len(data.get('pageData', []))
+        return total
+    except Exception as e:
+        print(f"Не удалось получить публикации для {guid}: {e}")
+        return 0
+    
+
+def get_trades_count(guid, headers=None):
+    try:
+        url = f"https://fedresurs.ru/backend/biddings?bankruptGuid={guid}&limit=1&offset=0"
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+        # Важно: смотрим, где лежит общее количество
+        # Например, data.get('total') или data.get('totalCount')
+        total = data.get('found') or data.get('totalCount') or len(data.get('pageData', []))
+        return total
+    except Exception as e:
+        print(f"Не удалось получить публикации для {guid}: {e}")
+        return 0
+
 
 
 def parse_json(html_text):
@@ -79,6 +112,7 @@ def parse_json(html_text):
 def get_company_details(guid):
     
     url_detail = f"{urld}/{guid}"
+    
     html_text = get_html_det(url_detail, headers=headers_variants)
     
     if not html_text:
@@ -109,8 +143,8 @@ def get_company_details(guid):
             'OKVED':okved_name,
             
             
-            'PublicationsCount':None,
-            'TradesCount':None,
+            'PublicationsCount': get_publications_count(guid, headers=headers_variants),
+            'TradesCount':get_trades_count(guid, headers=headers_variants),
             'SourceURL':url_detail,
 
 
