@@ -38,7 +38,6 @@ def parse_json(html_text):
         if 'lastLegalCase' in item and item['lastLegalCase']:
             legal_case = item['lastLegalCase']
             case_number = legal_case.get('number', '')
-            arbitr_manager = legal_case.get('arbitrManagerFio', '')
             
             if 'status' in legal_case and legal_case['status']:
                 status_obj = legal_case['status']
@@ -51,20 +50,50 @@ def parse_json(html_text):
             'Полное наименование': BS(html.unescape(item.get('name', '')), 'html.parser').text,
             'ИНН': item.get('inn', ''),
             'ОГРН': item.get('ogrn', ''),
-            'Статус': item.get('status', ''),
+            'Статус банкротства': item.get('status', ''),
             'Регион': item.get('region', ''),
             'Адрес': item.get('address', ''),
             'Тип процедуры': status_description, 
             'Номер судебного дела': case_number,
             'Статус дела' : item.get('isActive', ''),
             'Дата завершение производства': parse_iso_date(status_date),
-            'ФИО арбитражного управляющего': arbitr_manager,
-            'ИНН управляющего': None,
-            'Дата внесения данных в ЕГРЮЛ': parse_iso_date(item.get('statusUpdateDate', ''))
+            
             
         })
     
     return parsed_data
+
+
+def get_more_companies_details(guid):
+    """Получение полной информации по guid"""
+    url_detail = f"{urld}/{guid}/ieb?limit=1&offset=0"
+    html_text = fetch_html(url_detail, headers=headers_variants)
+    
+    if not html_text:
+        print(f"Пустой ответ для {guid}")
+        return {}
+
+    try:
+        item = json.loads(html_text)
+        items = item.get('pageData', [])
+        if not items:
+            print(f"Нет ИП данных для {guid}")
+            return {}
+        item = items[0] 
+        return{
+            'ФИО арбитражного управляющего': item.get('name', ''),
+            'ИНН управляющего': item.get('inn', ''),
+            'Дата внесения данных в ЕГРЮЛ': parse_iso_date(item.get('egrulDateCreate', ''))
+        }
+
+
+    except json.JSONDecodeError:
+        print(f"Не JSON для {guid}, первые 200 символов: {html_text[:200]}")
+        return {}
+    except Exception as e:
+        print(f"Ошибка обработки данных для {guid}: {e}")
+        return {}
+    
 
 
 def get_company_details(guid):

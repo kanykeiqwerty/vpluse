@@ -28,22 +28,16 @@ def save_to_excel(companies_data=None, individuals_data=None, filename='bankrupt
         for sheet_name in writer.sheets:
             sheet = writer.sheets[sheet_name]
 
-            for col_idx, col_cells in enumerate(sheet.columns, start=1):
+            for col_idx, col_cells in enumerate(sheet.iter_cols(), start=1):
                 max_length = 0
                 col_letter = get_column_letter(col_idx)
 
                 for row_idx, cell in enumerate(col_cells, start=1):
                     value = cell.value
 
-                    # Перенос текста внутри ячейки
-                    cell.alignment = Alignment(
-                        wrap_text=True,
-                        vertical='top'
-                    )
-
                     # Сделать заголовок жирным и больше
                     if row_idx == 1:
-                        cell.font = Font(bold=True, size=12)  # можно увеличить size по вкусу
+                        cell.font = Font(bold=True, size=12)
 
                     # Формат даты
                     if isinstance(value, (datetime, pd.Timestamp)):
@@ -51,9 +45,10 @@ def save_to_excel(companies_data=None, individuals_data=None, filename='bankrupt
                         value = value.strftime('%d.%m.%Y')
 
                     if value:
+                        # Учёт длинного текста, даже с переносами
                         max_length = max(max_length, len(str(value)))
 
-                # Автоширина колонок
-                sheet.column_dimensions[col_letter].width = min(max_length + 2, 50)
-    
+                # Автоширина колонок (чтобы текст был виден полностью)
+                sheet.column_dimensions[col_letter].width = max_length + 5  # +5 для отступа
+
     print(f" Данные сохранены в {filename}")

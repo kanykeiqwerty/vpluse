@@ -1,5 +1,5 @@
 from fetch import fetch_html
-from parser.list1 import parse_json, get_company_details
+from parser.list1 import parse_json, get_company_details, get_more_companies_details
 from parser.list2 import parse_person, get_persons_details, get_more_persons_details
 from ex import save_to_excel
 from config import url, urlp, PAGE_SIZE, headers
@@ -45,7 +45,7 @@ def main():
 
             print(f"Загружено всего: {len(companies_data)} компаний")
 
-            if len(companies_data) >= 1000:
+            if len(companies_data) >= 15:
                 break
 
        
@@ -55,6 +55,7 @@ def main():
             guid = company.get('guid')
             if not guid:
                 return
+            company.update(get_more_companies_details(guid))
             company.update(get_company_details(guid))
         with ThreadPoolExecutor(max_workers=4) as executor:
             futures = [executor.submit(load_company_details, comp) for comp in companies_data]
@@ -93,7 +94,7 @@ def main():
 
             print(f"Загружено всего: {len(individuals_data)} физлиц")
 
-            if len(individuals_data) >= 1000:
+            if len(individuals_data) >= 15:
                 break
 
         print(f"\nЗагружено физлиц: {len(individuals_data)}")
