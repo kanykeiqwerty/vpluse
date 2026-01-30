@@ -45,7 +45,7 @@ def main():
 
             print(f"Загружено всего: {len(companies_data)} компаний")
 
-            if len(companies_data) >= 1000:
+            if len(companies_data) >= 15:
                 break
 
        
@@ -93,7 +93,7 @@ def main():
 
             print(f"Загружено всего: {len(individuals_data)} физлиц")
 
-            if len(individuals_data) >= 1000:
+            if len(individuals_data) >= 15:
                 break
 
         print(f"\nЗагружено физлиц: {len(individuals_data)}")

@@ -14,12 +14,18 @@ def save_to_excel(companies_data=None, individuals_data=None, filename='bankrupt
         
         
         if companies_data:
+            for row in companies_data:
+                row.pop('guid', None)
             df_companies = pd.DataFrame(companies_data)
             df_companies.to_excel(writer, sheet_name='Юридические лица', index=False)
             print(f" Юридические лица: {len(companies_data)} записей")
         
        
         if individuals_data:
+            for row in individuals_data:
+                row.pop('guid', None)
+            
+
             df_individuals = pd.DataFrame(individuals_data)
             df_individuals.to_excel(writer, sheet_name='Физические лица', index=False)
             print(f" Физические лица: {len(individuals_data)} записей")

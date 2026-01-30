@@ -48,19 +48,19 @@ def parse_json(html_text):
 
         parsed_data.append({
             'guid': item.get('guid'),
-            'FullName': BS(html.unescape(item.get('name', '')), 'html.parser').text,
-            'INN': item.get('inn', ''),
-            'OGRN': item.get('ogrn', ''),
-            'Status': item.get('status', ''),
-            'Region': item.get('region', ''),
-            'Address': item.get('address', ''),
-            'ProcedureType': status_description, 
-            'CaseNumber': case_number,
-            'CaseStatus' : item.get('isActive', ''),
-            'CaseEndDate': parse_iso_date(status_date),
-            'ArbitrationManagerName': arbitr_manager,
-            'ArbitrationManagerINN': None,
-            'ManagerAppointmentDate': parse_iso_date(item.get('statusUpdateDate', ''))
+            'Полное наименование': BS(html.unescape(item.get('name', '')), 'html.parser').text,
+            'ИНН': item.get('inn', ''),
+            'ОГРН': item.get('ogrn', ''),
+            'Статус': item.get('status', ''),
+            'Регион': item.get('region', ''),
+            'Адрес': item.get('address', ''),
+            'Тип процедуры': status_description, 
+            'Номер судебного дела': case_number,
+            'Статус дела' : item.get('isActive', ''),
+            'Дата завершение производства': parse_iso_date(status_date),
+            'ФИО арбитражного управляющего': arbitr_manager,
+            'ИНН управляющего': None,
+            'Дата внесения данных в ЕГРЮЛ': parse_iso_date(item.get('statusUpdateDate', ''))
             
         })
     
@@ -94,16 +94,16 @@ def get_company_details(guid):
             okved_name = item['okved'].get('name', '')
            
         return {
-            'KPP': item.get('kpp', ''),
-            'AuthorizedCapital': item.get("authorizedCapital", ''),
-            'RegistrationDate': parse_iso_date(item.get('dateReg', '')),
-            'LegalForm': okopf_name,
-            'OKVED':okved_name,
+            'КПП': item.get('kpp', ''),
+            'Уставный капитал': item.get("authorizedCapital", ''),
+            'Дата регистрации': parse_iso_date(item.get('dateReg', '')),
+            'Правовая форма(ОКОПФ)': okopf_name,
+            'Виде деятельности(ОКВЭД)':okved_name,
             
             
-            'PublicationsCount': get_publications_count(guid, headers=headers_variants),
-            'TradesCount':get_trades_count(guid, headers=headers_variants),
-            'SourceURL':url_detail,
+            'Кол-во публикаций': get_publications_count(guid, headers=headers_variants),
+            'Кол-во торгов':get_trades_count(guid, headers=headers_variants),
+            'URL карточки':url_detail,
 
 
 

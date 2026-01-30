@@ -24,7 +24,15 @@ def parse_person(html_text):
     print("pageData len:", len(items))
     
     parsed_data = []
+    seen_ids = set()
     for item in items:
+        guid = item.get('guid')
+        if not guid:
+            continue
+        if guid in seen_ids:
+            continue
+
+        seen_ids.add(guid)
 
 
 
@@ -44,20 +52,21 @@ def parse_person(html_text):
                 status_obj = legal_case['status']
                 status_description = status_obj.get('description', '')
                 
+        
 
         parsed_data.append({
-            'guid': item.get('guid'),
-            'FullName': item.get('fio', ''),
-            'SNILS': item.get('snils', ''),
+            'guid': guid,
+            'ФИО': item.get('fio', ''),
+            'СНИЛС': item.get('snils', ''),
             
             
-            'Region': item.get('region', ''),
-            'ResidenceAddress': item.get('address', ''),
-            'ProcedureType': status_description, 
-            'CaseNumber': case_number,
+            'Регион': item.get('region', ''),
+            'Адрес проживания': item.get('address', ''),
+            'Тип процедуры': status_description, 
+            'Номер дела': case_number,
             
             
-            'ArbitrationManagerName': arbitr_manager,
+            'Управляющий': arbitr_manager,
            
             
         })
@@ -88,13 +97,15 @@ def get_persons_details(guid):
         okved = item.get('okved', {}) or {}
 
         return {
-            'EntrepreneurOGRNIP': item.get('ogrnip', ''),
-            'RegistrationDate': parse_iso_date(item.get('dateReg', '')),
-            'TerminationDate': parse_iso_date(status.get('date', '')),
-            'BankruptcyStatus': status.get('isActive', ''),
-            'EntrepreneurStatus': status.get('name', ''),
-            'OKVED': okved.get('name', ''),
-            'SourceURL': url_detail,
+            'ОГРНИП': item.get('ogrnip', ''),
+            'Статус ИП': status.get('name', ''),
+            'Вид деятельности': okved.get('name', ''),
+            'Дата регистрации ИП': parse_iso_date(item.get('dateReg', '')),
+            'Дата прекращения деятельности': parse_iso_date(status.get('date', '')),
+            'Статус банкротства': status.get('isActive', ''),
+            
+            
+            'URL карточки': url_detail,
         }
 
     except json.JSONDecodeError:
@@ -119,8 +130,8 @@ def get_more_persons_details(guid):
         item = json.loads(html_text)
 
         return{
-            'BirthDate': parse_iso_date(item.get('birthdateBankruptcy', '')), 
-            'BirthPlace': item.get('birthplaceBankruptcy', ''),
+            'Дата рождения': parse_iso_date(item.get('birthdateBankruptcy', '')), 
+            'Место рождения': item.get('birthplaceBankruptcy', ''),
         }
 
 
