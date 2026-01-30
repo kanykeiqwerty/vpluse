@@ -143,3 +143,57 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+#         print("\nЗАГРУЗКА ФИЗИЧЕСКИХ ЛИЦ")
+        
+#         offset = 0
+#         while True:
+#             full_url = f"{urlp}?isActiveLegalCase=null&limit={PAGE_SIZE}&offset={offset}"
+
+#             try:
+#                 html_text = fetch_html(full_url, headers=headers)
+                
+#                 parsed_data = parse_persons_full(html_text)
+#             except Exception as e:
+#                 print(f"Ошибка при загрузке или парсинге физлиц: {e}")
+#                 break
+
+#             print("RAW RESPONSE LENGTH:", len(html_text) if html_text else None)
+#             print("PARSED:", len(parsed_data))
+
+#             if not parsed_data:
+#                 print("Больше данных нет, выходим")
+#                 break
+
+#             individuals_data.extend(parsed_data)
+#             offset += PAGE_SIZE
+
+#             print(f"Загружено всего: {len(individuals_data)} физлиц")
+
+#             if len(individuals_data) >= 15:
+#                 break
+
+#         print(f"\nЗагружено физлиц: {len(individuals_data)}")
+
+#     except KeyboardInterrupt:
+#         save_and_exit()
+#         print("\nЗагрузка прервана пользователем")
+
+#     except Exception as e:
+#         print(f"\nПроизошла ошибка: {e}")
+#         import traceback
+#         traceback.print_exc()
+
+#     finally:
+#         print("\nСОХРАНЕНИЕ ДАННЫХ")
+        
+#         print(f"Компаний: {len(companies_data)}")
+#         print(f"Физлиц: {len(individuals_data)}")
+        
+#         save_to_excel(
+#             companies_data=companies_data if companies_data else None,
+#             individuals_data=individuals_data if individuals_data else None
+#         )
+#         print("Готово.")

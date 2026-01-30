@@ -52,3 +52,6 @@ def save_to_excel(companies_data=None, individuals_data=None, filename='bankrupt
                 sheet.column_dimensions[col_letter].width = max_length + 5  # +5 для отступа
 
     print(f" Данные сохранены в {filename}")
+
+
+

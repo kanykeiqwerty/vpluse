@@ -8,6 +8,7 @@ from .dop import parse_iso_date, get_publications_count, get_trades_count
 
 
 def parse_person(html_text):
+    """Парсит базовую информацию из списка"""
     if not html_text:
         print("html_text пустой")
         return []
@@ -34,14 +35,9 @@ def parse_person(html_text):
 
         seen_ids.add(guid)
 
-
-
-
         case_number = ''
         arbitr_manager = ''
         status_description = ''
-        
-        
 
         if 'lastLegalCase' in item and item['lastLegalCase']:
             legal_case = item['lastLegalCase']
@@ -51,31 +47,23 @@ def parse_person(html_text):
             if 'status' in legal_case and legal_case['status']:
                 status_obj = legal_case['status']
                 status_description = status_obj.get('description', '')
-                
-        
 
         parsed_data.append({
             'guid': guid,
             'ФИО': item.get('fio', ''),
             'СНИЛС': item.get('snils', ''),
-            
-            
             'Регион': item.get('region', ''),
             'Адрес проживания': item.get('address', ''),
             'Тип процедуры': status_description, 
             'Номер дела': case_number,
-            
-            
             'Управляющий': arbitr_manager,
-           
-            
         })
     
     return parsed_data
 
 
-
 def get_persons_details(guid):
+    """Получает данные об ИП"""
     url_detail = f"{urlpd}/{guid}/individual-entrepreneurs?limit=1&offset=0"
     html_text = fetch_html(url_detail, headers=headers_variants)
 
@@ -103,8 +91,6 @@ def get_persons_details(guid):
             'Дата регистрации ИП': parse_iso_date(item.get('dateReg', '')),
             'Дата прекращения деятельности': parse_iso_date(status.get('date', '')),
             'Статус банкротства': status.get('isActive', ''),
-            
-            
             'URL карточки': url_detail,
         }
 
@@ -115,7 +101,6 @@ def get_persons_details(guid):
         print(f"Ошибка обработки данных для {guid}: {e}")
         return {}
 
-    
 
 def get_more_persons_details(guid):
     """Получение полной информации по guid"""
@@ -129,11 +114,10 @@ def get_more_persons_details(guid):
     try:
         item = json.loads(html_text)
 
-        return{
+        return {
             'Дата рождения': parse_iso_date(item.get('birthdateBankruptcy', '')), 
             'Место рождения': item.get('birthplaceBankruptcy', ''),
         }
-
 
     except json.JSONDecodeError:
         print(f"Не JSON для {guid}, первые 200 символов: {html_text[:200]}")
@@ -141,6 +125,56 @@ def get_more_persons_details(guid):
     except Exception as e:
         print(f"Ошибка обработки данных для {guid}: {e}")
         return {}
+
+
+
+
+# def parse_persons_full(html_text):
     
-
-
+    
+#     base_persons = parse_person(html_text)
+    
+#     if not base_persons:
+#         return []
+    
+#     full_data = []
+    
+#     total = len(base_persons)
+    
+#     for i, person in enumerate(base_persons, 1):
+#         guid = person.get('guid')
+#         if not guid:
+#             continue
+        
+#         print(f"[{i}/{total}] Обработка {person.get('ФИО', 'N/A')} ")
+     
+#         details_ip = get_persons_details(guid)
+#         details_full = get_more_persons_details(guid)
+        
+        
+#         combined = {
+#             'guid': person.get('guid', ''),
+#             'ФИО': person.get('ФИО', ''),
+#             'ИНН': person.get('ИНН', ''),
+#             'СНИЛС': person.get('СНИЛС', ''),
+#             'Дата рождения': details_full.get('Дата рождения', ''),
+#             'Место рождения': details_full.get('Место рождения', ''),
+#             'Адрес проживания': person.get('Адрес проживания', ''),
+#             'Регион': person.get('Регион', ''),
+            
+#             'ОГРНИП': details_ip.get('ОГРНИП', ''),
+#             'Статус ИП': details_ip.get('Статус ИП', ''),
+#             'Вид деятельности': details_ip.get('Вид деятельности', ''),
+#             'Дата регистрации ИП': details_ip.get('Дата регистрации ИП', ''),
+#             'Дата прекращения деятельности': details_ip.get('Дата прекращения деятельности', ''),
+#             'Статус банкротства': details_ip.get('Статус банкротства', ''),
+#             'Тип процедуры': person.get('Тип процедуры', ''),
+#             'Номер дела': person.get('Номер дела', ''),
+#             'Управляющий': person.get('Управляющий', ''),
+            
+#             'URL карточки': details_ip.get('URL карточки', ''),
+#         }
+        
+#         full_data.append(combined)
+    
+#     return full_data
